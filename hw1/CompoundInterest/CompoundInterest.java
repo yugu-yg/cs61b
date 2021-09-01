@@ -46,9 +46,9 @@ public class CompoundInterest {
         return 0;
     }
 
-    /** Suppose you invest PERYEAR dollars at the end of every year until
-     *  TARGETYEAR, with growth compounded annually at RATE. This method
-     *  returns the total value of your savings in TARGETYEAR.
+    /** Suppose you invest PERYEAR dollars at the end of every year up to
+     *  and including TARGETYEAR, with growth compounded annually at RATE.
+     *  This method returns the total value of your savings in TARGETYEAR.
      *
      *  For example, if PERYEAR is 5000, TARGETYEAR is 2023, and RATE is 10,
      *  then the result will be 5000*1.1*1.1 + 5000*1.1 + 5000 =
