@@ -38,19 +38,19 @@ public class CompoundInterest {
      *  compounds annually at a constant rate of INFLATIONRATE.
      *
      *  For example, suppose PRESENTVALUE is 10, RATE is 12,
-     *  TARGETYEAR is 2023, and INFLATIONRATE is 3.
+     *  TARGETYEAR is 2022, and INFLATIONRATE is 3.
      *  In this case, the nominal value is 12.544. If we convert this into
-     *  2021 dollars, we get 12.544 * 0.97 * 0.97 = 11.8026496 dollars. */
+     *  2020 dollars, we get 12.544 * 0.97 * 0.97 = 11.8026496 dollars. */
     static double futureValueReal(double presentValue, double rate,
                                   int targetYear, double inflationRate) {
         return 0;
     }
 
-    /** Suppose you invest PERYEAR dollars at the end of every year up to
-     *  and including TARGETYEAR, with growth compounded annually at RATE.
-     *  This method returns the total value of your savings in TARGETYEAR.
+    /** Suppose you invest PERYEAR dollars at the end of every year until
+     *  TARGETYEAR, with growth compounded annually at RATE. This method
+     *  returns the total value of your savings in TARGETYEAR.
      *
-     *  For example, if PERYEAR is 5000, TARGETYEAR is 2023, and RATE is 10,
+     *  For example, if PERYEAR is 5000, TARGETYEAR is 2022, and RATE is 10,
      *  then the result will be 5000*1.1*1.1 + 5000*1.1 + 5000 =
      *  16550. */
     static double totalSavings(double perYear, int targetYear, double rate) {
