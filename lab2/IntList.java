@@ -115,7 +115,7 @@ public class IntList {
         int sum = 0;
         IntList p = L;
         while (p != null) {
-            sum = p.head;
+            sum = sum + p.head;
             p = p.tail;
         }
         return sum;
