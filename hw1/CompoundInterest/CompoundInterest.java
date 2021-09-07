@@ -60,7 +60,7 @@ public class CompoundInterest {
     static double totalSavings(double perYear, int targetYear, double rate) {
         double totalSavings;
         double q = 1+rate/100;
-        int n = targetYear - THIS_YEAR;
+        int n = targetYear - THIS_YEAR + 1;
         totalSavings = perYear*(1-Math.pow(q,n))/(1-q);
         return totalSavings;
     }
@@ -70,10 +70,11 @@ public class CompoundInterest {
      *  INFLATIONRATE. */
     static double totalSavingsReal(double perYear, int targetYear, double rate,
                                    double inflationRate) {
-        double totalSavingsReal;
-        double q = (1+rate/100)*(1-inflationRate/100);
-        int n = targetYear - THIS_YEAR;
-        totalSavingsReal = perYear*(1-Math.pow(q,n))/(1-q);
+        double totalSavings,totalSavingsReal;
+        double q = (1+rate/100);
+        int n = targetYear - THIS_YEAR + 1;
+        totalSavings = perYear*(1-Math.pow(q,n))/(1-q);
+        totalSavingsReal = totalSavings * Math.pow((1-inflationRate/100),n-1);
         return totalSavingsReal;
     }
 
@@ -106,10 +107,9 @@ public class CompoundInterest {
         double nominalSavings; // replace 0 with your code
         double realSavings;    // replace 0 with your code
         double q1 = 1+returnRate/100;
-        double q2 = (1+returnRate/100)*(1-inflationRate/100);
-        int n = targetYear - THIS_YEAR;
+        int n = targetYear - THIS_YEAR + 1;
         nominalSavings = perYear*(1-Math.pow(q1,n))/(1-q1);
-        realSavings = perYear*(1-Math.pow(q2,n))/(1-q2);
+        realSavings = nominalSavings*Math.pow((1-inflationRate/100),n-1);
         // Do not change anything in this method below this line
 
         String savingsSummary =

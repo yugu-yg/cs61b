@@ -26,13 +26,13 @@ public class CompoundInterestTest {
     @Test
     public void testTotalSavings() {
         double tolerance = 0.01;
-        assertEquals(3640434.34, CompoundInterest.totalSavings(10000, 2059, 10), tolerance);
+        assertEquals(16550, CompoundInterest.totalSavings(5000, 2023, 10), tolerance);
     }
 
     @Test
     public void testTotalSavingsReal() {
-        double tolerance = 0.01;
-        assertEquals(1605326.11, CompoundInterest.totalSavingsReal(10000, 2059, 10, 3), tolerance);
+        double tolerance = 1;
+        assertEquals(15572, CompoundInterest.totalSavingsReal(5000, 2023, 10, 3), tolerance);
     }
 
 
