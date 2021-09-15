@@ -26,15 +26,14 @@ class Lists {
             return new IntListList(L,null);
         }
         else {
-            IntList L1 = new IntList(L.head, null);
-            IntListList LL = new IntListList(L1, null);
-            while (L.head < L.tail.head && L.tail.tail != null) {
-                L1.tail = L.tail;
-                L = L.tail;
+            IntList L_move = L;
+            IntList L0 = L;
+            while (L_move.tail.head > L_move.head){
+                L_move = L_move.tail;
             }
-            L1.tail = null;
-            LL.tail = naturalRuns(L.tail);
-            return LL;
+            L = L.tail;
+            L_move.tail = null;
+            return new IntListList(L0, naturalRuns(L));
         }
     }
 }
