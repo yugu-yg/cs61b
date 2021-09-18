@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import static flood.Place.pl;
 import static flood.Utils.*;
+import static org.junit.Assert.assertFalse;
 
 /** The state of a Flood puzzle.  The cells have 0-based column and row numbers,
  *  and each contains a non-negative number indicating a color.  Methods allow
@@ -56,15 +57,24 @@ class Model {
     /** Initializes a copy of MODEL, not including its redo history. Does not
      *  modify or share structure with MODEL.  */
     Model(Model model) {
-        _width = model.width(); _height = model.height();
+        _width = model.width();
+        _height = model.height();
         _ncolors = model._ncolors;
         _current = _lastHistory = 0;
         _limit = model._limit - model._current;
         _active = new HashSet<>(model._active);
         _marks.addAll(model._marks);
+        int [][] src = new int [_height][_width];
+        int [][] dest = new int [_height][_width];
+        for(int i = 0; i < _height; i++){
+            for(int j = 0; j < _width; j++){
+                src[i][j] = model._cells[i][j];
+            }
+        }
+        deepCopy(src, dest);
+        _cells = dest;
         _history.add(new GameState());
         _history.get(0).saveState();
-        // FIXME
     }
 
     /** Returns the width (number of columns of cells) of the board. */
@@ -85,7 +95,7 @@ class Model {
     /** Return the number of moves since the initial board (not including
      *  undone moves). */
     int numMoves() {
-        return 0; // FIXME
+        return _current; // FIXME
     }
 
     /** Return the current move limit. Initially 0 until changed by setLimit. */
@@ -109,6 +119,10 @@ class Model {
     /** Apply ACTION.accept method to all four orthogonal neighbors of PLACE. */
     void forNeighbors(Place place, Consumer<Place> action) {
         // FIXME
+        if (place.row - 1 >= 0){ Place up = pl(place.row - 1 , place.col); action.accept(up);}
+        if (place.row + 1 <= _height - 1){Place down = pl(place.row + 1 , place.col); action.accept(down);}
+        if (place.col - 1 >= 0){Place left = pl(place.row, place.col - 1); action.accept(left);}
+        if (place.col + 1 <= _width - 1){ Place right = pl(place.row, place.col + 1); action.accept(right);}
     }
 
     /** Return to initial board, removing any marks. */
@@ -141,7 +155,20 @@ class Model {
     /** Returns an array with ncolors() elements, such that colors[c] iff
      *  there is a cell with color c present on the board. */
     boolean[] colorsPresent() {
-        return null; // FIXME
+        boolean[] present = new boolean[ncolors()];
+        int w = width();
+        int h = height();
+        for(int i = 0; i < h; i++){
+            for(int j = 0; j < w; j++){
+                for(int t = 0; t < ncolors(); t++){
+                   if (_cells[i][j] == t) {
+                       present[t] = true;
+                       break;
+                   }
+                   }
+                }
+            }
+        return present;
     }
 
     /** Returns the size of the active region. */
@@ -151,13 +178,14 @@ class Model {
 
     /** Returns true iff the puzzle is solved. */
     final boolean solved() {
-        return false; // FIXME
+        return activeRegionSize() == width()*height();
     }
 
     /** Returns true if this puzzle round is over: the puzzle is solved or
      *  the move limit has been reached. */
     boolean roundOver() {
-        return false; // FIXME
+        // FIXME
+        return (solved() || numMoves() >= _limit);
     }
 
     /** Returns the contents of location (ROW, COL). */
@@ -189,6 +217,12 @@ class Model {
      *  in RESULT. Returns RESULT. */
     HashSet<Place> findRegion(Place start, int color, HashSet<Place> result) {
         // FIXME.  (forNeighbors allows a concise implementation here.)
+        forNeighbors(start, (p) -> {
+            if (get(p) == color & !result.contains(p)) {
+                result.add(p);
+                findRegion(p, get(p), result);
+            }
+        });
         return result;
     }
 
@@ -197,13 +231,37 @@ class Model {
      *  clears all marks. */
     void setActiveRegionColor(int newColor) {
         // FIXME
+        HashSet<Place> pt = new HashSet<>();
+        pt = _active;
+        for(Place i : pt){
+            _cells[i.row][i.col] = newColor;
+            pt = sameColorRegion(i);
+        }
+        _active = pt;
+        _current += 1;
+        _history.add(new GameState());
+        _history.get(_current).saveState();
+        _lastHistory = _current;
+        clearMarks();
     }
 
     /** Return the set of cells that are adjacent to the active region and
      *  have color COLOR.  The contents of markedCells() is undefined
      *  after this. */
     Set<Place> adjacentCells(int color) {
-        return new HashSet<>(); // FIXME
+        // FIXME
+        HashSet<Place> present = new HashSet<>();
+        HashSet<Place> next = new HashSet<>();
+
+        present = _active;
+        for(Place i : present){
+            _cells[i.row][i.col] = color;
+            next = sameColorRegion(i);
+        }
+
+        HashSet<Place> result = new HashSet<>(next);
+        result.removeAll(present);
+        return result;
     }
 
     /** Set markedCells() from the contents of MARKS. */
@@ -252,7 +310,7 @@ class Model {
     private int[][] _cells;
 
     /** The current active region. */
-    private HashSet<Place> _active;
+    private HashSet _active;
 
     /** Move limit. */
     private int _limit;
