@@ -39,6 +39,7 @@ class Solver {
         while (!work.solved()) {
             num += 1;
             // FIXME
+            work.setActiveRegionColor(chooseBestMove(work));
         }
         return num;
     }
@@ -90,6 +91,14 @@ class Solver {
         bestMove = -1;
         maxSize = -1;
         // FIXME
+        for (int i = 0; i < model.ncolors(); i++){
+            Model model2 = new Model(model);
+            model2.setActiveRegionColor(i);
+            if (model2.activeRegionSize() > model.activeRegionSize()){
+                bestMove = i;
+                maxSize = model2.activeRegionSize();
+            }
+        }
         return new int[] { bestMove, maxSize };
     }
 

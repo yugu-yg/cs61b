@@ -17,7 +17,10 @@ class PuzzleGenerator implements PuzzleSource {
 
     @Override
     public Model getPuzzle(int width, int height, int ncolors, int extra) {
-        return null; // FIXME
+        int[][] initial = new int[height][width];
+        Model model = new Model(initial, ncolors);
+        model.setLimit(Solver.movesNeeded(model) + extra);
+        return model; // FIXME
     }
 
 
