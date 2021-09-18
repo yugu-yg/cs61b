@@ -89,12 +89,14 @@ class Solver {
         int bestMove, maxSize;
         bestMove = -1;
         maxSize = -1;
+        Model bestModel = new Model(model);
         for (int i = 0; i < model.ncolors(); i++) {
             Model model2 = new Model(model);
             model2.setActiveRegionColor(i);
-            if (model2.activeRegionSize() > model.activeRegionSize()) {
+            if (model2.activeRegionSize() > bestModel.activeRegionSize()) {
                 bestMove = i;
                 maxSize = model2.activeRegionSize();
+                bestModel = model2;
             }
         }
         return new int[] { bestMove, maxSize };

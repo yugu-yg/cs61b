@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 
 import static flood.Place.pl;
 import static flood.Utils.*;
-import static org.junit.Assert.assertFalse;
 
 /** The state of a Flood puzzle.  The cells have 0-based column and row numbers,
  *  and each contains a non-negative number indicating a color.  Methods allow
