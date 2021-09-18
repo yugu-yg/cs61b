@@ -222,6 +222,7 @@ class Model {
      *  reachable by an orthogonal path from START without traversing cells
      *  in RESULT. Returns RESULT. */
     HashSet<Place> findRegion(Place start, int color, HashSet<Place> result) {
+        result.add(start);
         forNeighbors(start, (p) -> {
             if (get(p) == color & !result.contains(p)) {
                 result.add(p);
