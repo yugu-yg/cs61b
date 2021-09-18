@@ -1,7 +1,7 @@
 package flood;
 
 /** Functions for solving a Flood puzzle.
- *  @author
+ *  @author P. N. Hilfinger
  */
 class Solver {
 
@@ -38,7 +38,6 @@ class Solver {
         num = 0;
         while (!work.solved()) {
             num += 1;
-            // FIXME
             work.setActiveRegionColor(chooseBestMove(work));
         }
         return num;
@@ -90,11 +89,10 @@ class Solver {
         int bestMove, maxSize;
         bestMove = -1;
         maxSize = -1;
-        // FIXME
-        for (int i = 0; i < model.ncolors(); i++){
+        for (int i = 0; i < model.ncolors(); i++) {
             Model model2 = new Model(model);
             model2.setActiveRegionColor(i);
-            if (model2.activeRegionSize() > model.activeRegionSize()){
+            if (model2.activeRegionSize() > model.activeRegionSize()) {
                 bestMove = i;
                 maxSize = model2.activeRegionSize();
             }

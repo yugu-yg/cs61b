@@ -104,8 +104,7 @@ public class ModelTests {
         boolean[] present = model.colorsPresent();
         assertEquals("Must have ncolors() elements", 6, present.length);
         assertArrayEquals("Wrong colorss",
-                new boolean[] { true, true, true, true,
-                        false, false },
+                new boolean[] { true, true, true, true, false, false },
                 model.colorsPresent());
     }
 

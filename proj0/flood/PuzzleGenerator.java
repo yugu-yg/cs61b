@@ -5,7 +5,7 @@ import java.util.Random;
 import static flood.Utils.*;
 
 /** A creator of random Flood puzzles.
- *  @author
+ *  @author P. N. Hilfinger
  */
 class PuzzleGenerator implements PuzzleSource {
 
@@ -20,7 +20,7 @@ class PuzzleGenerator implements PuzzleSource {
         int[][] initial = new int[height][width];
         Model model = new Model(initial, ncolors);
         model.setLimit(Solver.movesNeeded(model) + extra);
-        return model; // FIXME
+        return model;
     }
 
 

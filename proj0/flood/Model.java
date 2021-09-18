@@ -23,7 +23,7 @@ import static org.junit.Assert.assertFalse;
  *  index or using Places (which represent a row and column index).  Row 0
  *  is intended to represent the top row when the board is displayed.
  *
- *  @author
+ *  @author P. N. Hilfinger
  */
 class Model {
 
@@ -66,8 +66,8 @@ class Model {
         _marks.addAll(model._marks);
         int [][] src = new int [_height][_width];
         int [][] dest = new int [_height][_width];
-        for(int i = 0; i < _height; i++){
-            for(int j = 0; j < _width; j++){
+        for (int i = 0; i < _height; i++) {
+            for (int j = 0; j < _width; j++) {
                 src[i][j] = model._cells[i][j];
             }
         }
@@ -95,7 +95,7 @@ class Model {
     /** Return the number of moves since the initial board (not including
      *  undone moves). */
     int numMoves() {
-        return _current; // FIXME
+        return _current;
     }
 
     /** Return the current move limit. Initially 0 until changed by setLimit. */
@@ -118,11 +118,19 @@ class Model {
 
     /** Apply ACTION.accept method to all four orthogonal neighbors of PLACE. */
     void forNeighbors(Place place, Consumer<Place> action) {
-        // FIXME
-        if (place.row - 1 >= 0){ Place up = pl(place.row - 1 , place.col); action.accept(up);}
-        if (place.row + 1 <= _height - 1){Place down = pl(place.row + 1 , place.col); action.accept(down);}
-        if (place.col - 1 >= 0){Place left = pl(place.row, place.col - 1); action.accept(left);}
-        if (place.col + 1 <= _width - 1){ Place right = pl(place.row, place.col + 1); action.accept(right);}
+        if (place.row - 1 >= 0) {
+            Place up = pl(place.row - 1, place.col);
+            action.accept(up);
+        }
+        if (place.row + 1 <= _height - 1) {
+            Place down = pl(place.row + 1, place.col); action.accept(down);
+        }
+        if (place.col - 1 >= 0) {
+            Place left = pl(place.row, place.col - 1); action.accept(left);
+        }
+        if (place.col + 1 <= _width - 1) {
+            Place right = pl(place.row, place.col + 1); action.accept(right);
+        }
     }
 
     /** Return to initial board, removing any marks. */
@@ -158,16 +166,16 @@ class Model {
         boolean[] present = new boolean[ncolors()];
         int w = width();
         int h = height();
-        for(int i = 0; i < h; i++){
-            for(int j = 0; j < w; j++){
-                for(int t = 0; t < ncolors(); t++){
-                   if (_cells[i][j] == t) {
-                       present[t] = true;
-                       break;
-                   }
-                   }
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                for (int t = 0; t < ncolors(); t++) {
+                    if (_cells[i][j] == t) {
+                        present[t] = true;
+                        break;
+                    }
                 }
             }
+        }
         return present;
     }
 
@@ -178,13 +186,12 @@ class Model {
 
     /** Returns true iff the puzzle is solved. */
     final boolean solved() {
-        return activeRegionSize() == width()*height();
+        return activeRegionSize() == width() * height();
     }
 
     /** Returns true if this puzzle round is over: the puzzle is solved or
      *  the move limit has been reached. */
     boolean roundOver() {
-        // FIXME
         return (solved() || numMoves() >= _limit);
     }
 
@@ -216,7 +223,6 @@ class Model {
      *  reachable by an orthogonal path from START without traversing cells
      *  in RESULT. Returns RESULT. */
     HashSet<Place> findRegion(Place start, int color, HashSet<Place> result) {
-        // FIXME.  (forNeighbors allows a concise implementation here.)
         forNeighbors(start, (p) -> {
             if (get(p) == color & !result.contains(p)) {
                 result.add(p);
@@ -230,10 +236,9 @@ class Model {
      *  this change to allow undoing it, updates the active region, and
      *  clears all marks. */
     void setActiveRegionColor(int newColor) {
-        // FIXME
         HashSet<Place> pt = new HashSet<>();
         pt = _active;
-        for(Place i : pt){
+        for (Place i : pt) {
             _cells[i.row][i.col] = newColor;
             pt = sameColorRegion(i);
         }
@@ -249,12 +254,11 @@ class Model {
      *  have color COLOR.  The contents of markedCells() is undefined
      *  after this. */
     Set<Place> adjacentCells(int color) {
-        // FIXME
         HashSet<Place> present = new HashSet<>();
         HashSet<Place> next = new HashSet<>();
 
         present = _active;
-        for(Place i : present){
+        for (Place i : present) {
             _cells[i.row][i.col] = color;
             next = sameColorRegion(i);
         }
