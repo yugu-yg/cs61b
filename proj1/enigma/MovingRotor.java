@@ -1,9 +1,11 @@
 package enigma;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
+
 import static enigma.EnigmaException.*;
 
 /** Class that represents a rotating rotor in the enigma machine.
- *  @author
+ *  @author Yu
  */
 class MovingRotor extends Rotor {
 
@@ -14,16 +16,29 @@ class MovingRotor extends Rotor {
      */
     MovingRotor(String name, Permutation perm, String notches) {
         super(name, perm);
-        // FIXME
+        _notches = notches;
     }
-
-    // FIXME?
 
     @Override
     void advance() {
-        // FIXME
+        set(permutation().wrap(setting() + 1));
     }
 
-    // FIXME: ADDITIONAL FIELDS HERE, AS NEEDED
+    @Override
+    boolean rotates() {
+        return true;
+    }
+
+    @Override
+    boolean atNotch() {
+        char setting = alphabet().toChar(setting());
+        return _notches.indexOf(setting) != -1;
+    }
+
+    String get_notches() {
+        return  _notches;
+    }
+
+    private String _notches;
 
 }

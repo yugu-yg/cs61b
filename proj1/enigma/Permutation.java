@@ -1,10 +1,12 @@
 package enigma;
 
+import java.util.ArrayList;
+
 import static enigma.EnigmaException.*;
 
 /** Represents a permutation of a range of integers starting at 0 corresponding
  *  to the characters of an alphabet.
- *  @author
+ *  @author Yu
  */
 class Permutation {
 
@@ -15,14 +17,34 @@ class Permutation {
      *  Whitespace is ignored. */
     Permutation(String cycles, Alphabet alphabet) {
         _alphabet = alphabet;
-        // FIXME
+        _permutation = helper(cycles);
     }
+
+    public ArrayList<String> helper(String cycles) {
+        if (cycles.length() == 0) {
+            return new ArrayList<>();
+        }
+        ArrayList<String> result = new ArrayList<>();
+        for (int i = 0; i < cycles.length(); i++) {
+            if (cycles.charAt(i) == '(') {
+                String tmp = "";
+                int bracket = 0;
+                while (cycles.charAt(i + 1) != ')') {
+                    tmp += cycles.charAt(i + 1);
+                    i += 1;
+                    bracket = i;
+                }
+                result.add(tmp);
+                i += bracket;
+            }
+        }
+        return result;
+    }
+
 
     /** Add the cycle c0->c1->...->cm->c0 to the permutation, where CYCLE is
      *  c0c1...cm. */
-    private void addCycle(String cycle) {
-        // FIXME
-    }
+    private void addCycle(String cycle) {}
 
     /** Return the value of P modulo the size of this permutation. */
     final int wrap(int p) {
@@ -35,30 +57,56 @@ class Permutation {
 
     /** Returns the size of the alphabet I permute. */
     int size() {
-        return 0; // FIXME
+        return _alphabet.size();
     }
 
     /** Return the result of applying this permutation to P modulo the
      *  alphabet size. */
     int permute(int p) {
-        return 0;  // FIXME
+        char input = _alphabet.toChar(wrap(p));
+        char output = permute(input);
+        return _alphabet.toInt(output);
     }
 
     /** Return the result of applying the inverse of this permutation
      *  to  C modulo the alphabet size. */
     int invert(int c) {
-        return 0;  // FIXME
+        char input = _alphabet.toChar(wrap(c));
+        char output = invert(input);
+        return _alphabet.toInt(output);
     }
 
     /** Return the result of applying this permutation to the index of P
      *  in ALPHABET, and converting the result to a character of ALPHABET. */
     char permute(char p) {
-        return 0;  // FIXME
+        for (String tmp : _permutation) {
+            if (tmp.indexOf(p) != -1) {
+                if (tmp.length() == 1) {
+                    return p;
+                } else if (tmp.indexOf(p) + 1 == tmp.length()) {
+                    return tmp.charAt(0);
+                } else {
+                    return tmp.charAt(tmp.indexOf(p) + 1);
+                }
+            }
+        }
+        throw new EnigmaException("char is not in the alphabet");
     }
 
     /** Return the result of applying the inverse of this permutation to C. */
     char invert(char c) {
-        return 0;  // FIXME
+        for (String tmp : _permutation) {
+            if (tmp.indexOf(c) != -1) {
+                if (tmp.length() == 1) {
+                    return c;
+                } else if (tmp.indexOf(c) == 0) {
+                    return tmp.charAt(tmp.length() - 1);
+                } else {
+                    return tmp.charAt(tmp.indexOf(c) - 1);
+                }
+            }
+        }
+        throw new EnigmaException("char is not in the alphabet");
     }
 
     /** Return the alphabet used to initialize this Permutation. */
@@ -69,11 +117,15 @@ class Permutation {
     /** Return true iff this permutation is a derangement (i.e., a
      *  permutation for which no value maps to itself). */
     boolean derangement() {
-        return true;  // FIXME
+        for (String tmp : _permutation) {
+            if (tmp.length() == 1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** Alphabet of this permutation. */
     private Alphabet _alphabet;
-
-    // FIXME: ADDITIONAL FIELDS HERE, AS NEEDED
+    private ArrayList<String> _permutation;
 }
