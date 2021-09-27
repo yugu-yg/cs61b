@@ -1,8 +1,5 @@
 package enigma;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
-
-import static enigma.EnigmaException.*;
 
 /** Class that represents a rotating rotor in the enigma machine.
  *  @author Yu

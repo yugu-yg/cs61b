@@ -1,6 +1,5 @@
 package enigma;
 
-import static enigma.EnigmaException.*;
 
 /** Superclass that represents a rotor in the enigma machine.
  *  @author Yu
