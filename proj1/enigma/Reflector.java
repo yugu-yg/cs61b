@@ -3,7 +3,7 @@ package enigma;
 import static enigma.EnigmaException.*;
 
 /** Class that represents a reflector in the enigma.
- *  @author Yu
+ *  @author
  */
 class Reflector extends FixedRotor {
 
@@ -11,11 +11,13 @@ class Reflector extends FixedRotor {
      * is PERM. */
     Reflector(String name, Permutation perm) {
         super(name, perm);
-        if (!perm.derangement()) {
-            throw new EnigmaException("this permutation is not a derangement");
-        }
+        // FIXME
     }
 
+    /** Return true iff I reflect. */
+    boolean reflecting() {
+        return true;
+    }
 
     @Override
     void set(int posn) {
@@ -23,11 +25,5 @@ class Reflector extends FixedRotor {
             throw error("reflector has only one position");
         }
     }
-
-    @Override
-    boolean reflecting() {
-        return true;
-    }
-
 
 }

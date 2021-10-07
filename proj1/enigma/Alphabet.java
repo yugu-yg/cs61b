@@ -1,53 +1,54 @@
 package enigma;
 
+import static enigma.EnigmaException.*;
+
+/* Extra Credit Only */
+
 /** An alphabet of encodable characters.  Provides a mapping from characters
  *  to and from indices into the alphabet.
- *  @author Yu
+ *  @author
  */
 class Alphabet {
+    String _chars;
 
-    /** A new alphabet containing CHARS. The K-th character has index
-     *  K (numbering from 0). No character may be duplicated. */
+    /** A new alphabet containing CHARS.  Character number #k has index
+     *  K (numbering from 0push. No character may be duplicated. */
     Alphabet(String chars) {
         _chars = chars;
     }
 
-    /** A default alphabet of all upper-case characters. */
-    Alphabet() {
-        this("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    }
-
     /** Returns the size of the alphabet. */
     int size() {
-        return _chars.length();
+        return _chars.length(); // FIXME
     }
 
-    /** Returns true if CH is in this alphabet. */
-    boolean contains(char ch) {
+    /** Returns true if C is in this alphabet. */
+    boolean contains(char c) {
         for (int i = 0; i < size(); i++) {
-            if (_chars.charAt(i) == ch) {
+            if (_chars.charAt(i) == c) {
                 return true;
             }
         }
-        return false;
+        return false; // FIXME
     }
 
     /** Returns character number INDEX in the alphabet, where
      *  0 <= INDEX < size(). */
     char toChar(int index) {
-        return _chars.charAt(index);
+        if (index < 0 || index >= size()) {
+            throw error("character index out of range");
+        }
+        return _chars.charAt(index); // FIXME
     }
 
-    /** Returns the index of character CH which must be in
-     *  the alphabet. This is the inverse of toChar(). */
-    int toInt(char ch) {
+    /** Returns the index of character C, which must be in the alphabet. */
+    int toInt(char c) {
         for (int i = 0; i < size(); i++) {
-            if (_chars.charAt(i) == ch) {
+            if (_chars.charAt(i) == c) {
                 return i;
             }
         }
-        throw new EnigmaException("char not in the alphabet");
+        throw error("character not in alphabet"); // FIXME
     }
 
-    private String _chars;
 }

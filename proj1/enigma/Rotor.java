@@ -1,8 +1,9 @@
 package enigma;
 
+import static enigma.EnigmaException.*;
 
 /** Superclass that represents a rotor in the enigma machine.
- *  @author Yu
+ *  @author
  */
 class Rotor {
 
@@ -45,31 +46,40 @@ class Rotor {
 
     /** Return my current setting. */
     int setting() {
-        return _setting;
+        return _setting; // FIXME
     }
 
     /** Set setting() to POSN.  */
     void set(int posn) {
-        _setting = _permutation.wrap(posn);
+        _setting = mod(posn, 26);
     }
 
     /** Set setting() to character CPOSN. */
     void set(char cposn) {
-        _setting  = _permutation.alphabet().toInt(cposn);
+        _setting = alphabet().toInt(cposn);
+    }
+
+    /** Return the value of P modulo the input SIZE. */
+    int mod(int p, int size) {
+        int r = p % size;
+        if (r < 0) {
+            r += size;
+        }
+        return r;
     }
 
     /** Return the conversion of P (an integer in the range 0..size()-1)
      *  according to my permutation. */
     int convertForward(int p) {
-        int perm = _permutation.permute(_permutation.wrap(_setting + p));
-        return  _permutation.wrap(perm - _setting);
+        int result = _permutation.permute(p+_setting % size());
+        return mod(result-_setting, size());   // FIXME
     }
 
     /** Return the conversion of E (an integer in the range 0..size()-1)
      *  according to the inverse of my permutation. */
     int convertBackward(int e) {
-        int back_perm = _permutation.permute( _permutation.wrap(_setting + e));
-        return _permutation.wrap(back_perm - _setting);
+        int result = _permutation.invert(e+_setting % size());
+        return mod(result-_setting, size());   // FIXME
     }
 
     /** Returns true iff I am positioned to allow the rotor to my left
@@ -90,7 +100,10 @@ class Rotor {
     /** My name. */
     private final String _name;
 
-    /** The permutation implemented by this rotor in its 0 position. */
+    /** The permutation implemnted by this rotor in its 0 position. */
     private Permutation _permutation;
+
+    /** The setting implemented by the rotor at the current stage. */
     private int _setting;
+
 }

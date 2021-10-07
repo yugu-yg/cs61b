@@ -1,8 +1,9 @@
 package enigma;
 
+import static enigma.EnigmaException.*;
 
 /** Class that represents a rotating rotor in the enigma machine.
- *  @author Yu
+ *  @author
  */
 class MovingRotor extends Rotor {
 
@@ -17,25 +18,26 @@ class MovingRotor extends Rotor {
     }
 
     @Override
-    void advance() {
-        set(permutation().wrap(setting() + 1));
-    }
-
-    @Override
     boolean rotates() {
         return true;
     }
 
     @Override
     boolean atNotch() {
-        char setting = alphabet().toChar(setting());
-        return _notches.indexOf(setting) != -1;
+        for (int i = 0; i < _notches.length(); i++) {
+            if (alphabet().toInt(_notches.charAt(i)) == this.setting()) {
+                return true;
+            } 
+        }
+        return false;
     }
 
-    String get_notches() {
-        return  _notches;
+    @Override
+    void advance() {
+        this.set(this.setting()+1);
     }
 
+    /** String containing notches of the Rotor. */
     private String _notches;
 
 }
