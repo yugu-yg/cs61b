@@ -1,19 +1,16 @@
 package enigma;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.regex.Pattern;
-import java.lang.String;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 import static enigma.EnigmaException.*;
 
 /** Enigma simulator.
- *  @author
+ *  @author Zachary Zhu
  */
 public final class Main {
 
@@ -79,134 +76,171 @@ public final class Main {
      *  file _config and apply it to the messages in _input, sending the
      *  results to _output. */
     private void process() {
-        Machine enigma = readConfig();
-        String next = _input.nextLine();
-        while (_input.hasNext()) {
-            String setting = next;
-            if (!setting.contains("*")) {
-                throw new EnigmaException("Wrong setting format");
-            }
-            setUp(enigma, setting);
-            next = (_input.nextLine()).toUpperCase();
-            while (next.isEmpty()) {
-                next = (_input.nextLine()).toUpperCase();
-            }
-            while (!(next.contains("*"))) {
-                String result = enigma.convert(next.replaceAll(" ", ""));
-                if (next.isEmpty()) {
-                    _output.println();
-                } else {
-                    printMessageLine(result);
-                }
-                if (!_input.hasNext()) {
-                    next = "*";
-                } else {
-                    next = (_input.nextLine()).toUpperCase();
-                }
-            }
+        /**
+         * Get next line
+         * Scan it
+         * Pass scanned message to output
+         * read scanned message
+         * If nextLine() is blank, that means it's an empty line
+         */
+        Machine m = readConfig();
+        String configMsg = characteredLine();
+        if (configMsg.length() == 0) {
+            throw new EnigmaException("Argument is invalid");
+        } else if (configMsg.charAt(0) != '*') {
+            throw new EnigmaException("Argument doesn't "
+                    + "start with asterisk");
         }
+        while (_input.hasNextLine()) {
+            setUp(m, configMsg);
+            while (_input.hasNext("[^*]+")) {
+                String line = _input.nextLine();
+                Scanner scanLine = new Scanner(line);
+                String inputMsg = "";
+                while (scanLine.hasNext()) {
+                    inputMsg += scanLine.next();
+                }
+                String message = m.convert(inputMsg);
+                printMessageLine(message);
+            }
+            if (_input.hasNextLine()) {
+                String inputMsg = _input.nextLine();
+                if (inputMsg.equals("")) {
+                    _output.append("\n");
+                    configMsg = characteredLine();
+                } else {
+                    configMsg = inputMsg;
+                }
+            }
+
+        }
+
+    }
+
+    /**
+     * Dealing with the blank line problem above.
+     * @return next line that isn't blank.
+     */
+    private String characteredLine() {
+        String blank = "";
+        while (blank.equals("") && _input.hasNextLine()) {
+            blank = _input.nextLine();
+        }
+        return blank;
     }
 
     /** Return an Enigma machine configured from the contents of configuration
      *  file _config. */
     private Machine readConfig() {
         try {
-            String alphabet = _config.next();
-            if (alphabet.contains("(") || alphabet.contains(")") || alphabet.contains("*")) {
-                throw new EnigmaException("Wrong config format");
-            }
-            _alphabet = new Alphabet(alphabet);
-            
-            if (!_config.hasNextInt()) {
-                throw new EnigmaException("Wrong config format");
-            }
-            int numRotors = _config.nextInt();
-            if (!_config.hasNextInt()) {
-                throw new EnigmaException("Wrong config format");
-            }
-            int pawls = _config.nextInt();
-            temp = (_config.next()).toUpperCase();
+            _alphabet = new Alphabet(_config.next());
+            int numRotors = Integer.parseInt(_config.next());
+            int numPawls = Integer.parseInt(_config.next());
+            ArrayList<Rotor> allRotors = new ArrayList<>();
             while (_config.hasNext()) {
-                name = temp;
-                notches = (_config.next()).toUpperCase();
-                _allTheRotors.add(readRotor());
+                Rotor r = readRotor();
+                allRotors.add(r);
             }
-            return new Machine(_alphabet, numRotors, pawls, _allTheRotors);
+            return new Machine(_alphabet, numRotors, numPawls, allRotors);
         } catch (NoSuchElementException excp) {
             throw error("configuration file truncated");
+        } catch (NumberFormatException excp) {
+            throw error("num Rotors and numPawls should be int");
         }
     }
 
     /** Return a rotor, reading its description from _config. */
     private Rotor readRotor() {
         try {
-            perm = "";
-            temp = (_config.next()).toUpperCase();
-            while (temp.contains("(") && _config.hasNext()) {
-                perm = perm.concat(temp + " ");
-                temp = (_config.next()).toUpperCase();
-            }
-            if (!_config.hasNext()) {
-                perm = perm.concat(temp + " ");
+            String name = _config.next();
+            String typeNotches = _config.next();
+            char type = typeNotches.charAt(0);
+            String notches = typeNotches.substring(1);
+            String rotorCycles = "";
+            while (_config.hasNext("[(][^*]+[)]")) {
+                rotorCycles += _config.next();
             }
 
-            if (notches.charAt(0) == 'M') {
-                return new MovingRotor(name, new Permutation(perm, _alphabet), notches.substring(1));
-            } else if (notches.charAt(0) == 'N') {
-                return new FixedRotor(name, new Permutation(perm, _alphabet));
+            if (type == 'R') {
+                return new Reflector(name,
+                        new Permutation(rotorCycles, _alphabet));
+            } else if (type == 'N') {
+                return new FixedRotor(name,
+                        new Permutation(rotorCycles, _alphabet));
+            } else if (type == 'M') {
+                if (notches.length() == 0) {
+                    throw new EnigmaException("Empty notches for moving rotor");
+                }
+                return new MovingRotor(name,
+                        new Permutation(rotorCycles, _alphabet), notches);
             } else {
-                return new Reflector(name, new Permutation(perm, _alphabet));
+                throw new EnigmaException("Invalid rotor type");
             }
+
         } catch (NoSuchElementException excp) {
             throw error("bad rotor description");
         }
     }
 
+
     /** Set M according to the specification given on SETTINGS,
      *  which must have the format specified in the assignment. */
     private void setUp(Machine M, String settings) {
-        String[] set = settings.split(" ");
-        if (set.length - 1 < M.numRotors()) {
-            throw new EnigmaException("Not enough arguments in setting");
+        Scanner configSettings = new Scanner(settings);
+        boolean isRingStalleung = false;
+        if (!configSettings.next().equals("*")) {
+            throw new EnigmaException("Doesn't start with asterisk");
+        }
+        ArrayList<String> names = new ArrayList<String>();
+        while (configSettings.hasNext("[^(]+")) {
+            names.add(configSettings.next());
+        }
+        HashMap<String, Rotor> temp = M.getRotorHashMap();
+        if (!temp.containsKey(names.get(names.size() - 2))) {
+            isRingStalleung = true;
+        }
+        String[] namesArray;
+        String setting;
+        String ringSetting = "";
+        if (!isRingStalleung) {
+            setting = names.get(names.size() - 1);
+            names.remove(names.size() - 1);
+            namesArray = new String[names.size()];
+        } else {
+            setting = names.get(names.size() - 2);
+            ringSetting = names.get(names.size() - 1);
+            names.remove(names.size() - 1);
+            names.remove(names.size() - 1);
+            namesArray = new String[names.size()];
+        }
+        for (int i = 0; i < names.size(); i += 1) {
+            namesArray[i] = names.get(i);
+        }
+        String plugboardString = "";
+        while (configSettings.hasNext()) {
+            plugboardString += configSettings.next();
+        }
+        M.insertRotors(namesArray);
+        M.setRotors(setting);
+        M.setPlugboard(new Permutation(plugboardString, _alphabet));
+        if (isRingStalleung) {
+            M.ringstalleungRotors(ringSetting);
         }
 
-        String[] rotors = new String[M.numRotors()];
-        for (int i = 1; i < M.numRotors()+1; i++) {
-            rotors[i-1] = set[i];
-        }
-
-        for (int i = 0; i < rotors.length - 1; i++) {
-            for (int j = i + 1; j < rotors.length; j++) {
-                if (rotors[i].equals(rotors[j])) {
-                    throw new EnigmaException("Repeated Rotor");
-                }
-            }
-        }
-
-        String steckered = "";
-        for (int i = 7; i < set.length; i++) {
-            steckered = steckered.concat(set[i] + " ");
-        }
-        M.insertRotors(rotors);
-        if (M._rotors[0].reflecting() != true) {
-            throw new EnigmaException("First Rotor should be a reflector");
-        }
-        M.setRotors(set[M.numRotors()+1]);
-        M.setPlugboard(new Permutation(steckered, _alphabet));
 
     }
 
     /** Print MSG in groups of five (except that the last group may
      *  have fewer letters). */
     private void printMessageLine(String msg) {
-        for (int i = 0; i < msg.length(); i += 5) {
-            int cap = msg.length() - i;
-            if (cap <= 5) {
-                _output.println(msg.substring(i, i+cap));
-            } else {
-                _output.print(msg.substring(i, i+5) + " ");
-            }
+        while (msg.length() >= 5) {
+            _output.append(msg.substring(0, 5) + " ");
+            msg = msg.substring(5);
         }
+        if (msg.length() != 0) {
+            _output.append(msg);
+        }
+        _output.append("\n");
     }
 
     /** Alphabet used in this machine. */
@@ -220,19 +254,4 @@ public final class Main {
 
     /** File for encoded/decoded messages. */
     private PrintStream _output;
-
-    /** An ArrayList containing all rotors that can be used. */
-    private ArrayList<Rotor> _allTheRotors = new ArrayList<>();
-
-    /** A String containing cycles which readRotor() appends to. */
-    private String perm;
-
-    /** Name of current rotor. */
-    private String name;
-
-    /** Temporary string that is set to NEXT token of _config. */
-    private String temp;
-
-    /** Type and notches of current rotor. */
-    private String notches;
 }

@@ -1,13 +1,13 @@
 package enigma;
 
 import java.util.HashMap;
-import java.util.ArrayList;
+
 /** Utility definitions for use in unit tests.
  *  @author P. N. Hilfinger
  */
 class TestUtils {
 
-    protected static final Alphabet UPPER = new UpperCaseAlphabet();
+    protected static final Alphabet UPPER = new Alphabet();
     protected static final String UPPER_STRING =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -124,17 +124,6 @@ class TestUtils {
         NAVALZ_MAP.put("VIII", "WGLRIUMYPDCKTQEASBNFXOJVZH");
         NAVALZ_MAP.put("Beta", "TMFZKWDOJYXQCRNESUBLAHGVIP");
         NAVALZ_MAP.put("Gamma", "EGTPLBOVFSINCUJZDXMRQAYWHK");
-    }
-
-    /** A shortened implementation of ALLROTORS. */
-    static final ArrayList<Rotor> ALL_ROTORS = new ArrayList<>();
-    static {
-        ALL_ROTORS.add(new Reflector("B", new Permutation("(AE) (BN) (CK) (DQ) (FU) (GY) (HW) (IJ) (LO) (MP) (RX) (SZ) (TV)", UPPER)));
-        ALL_ROTORS.add(new FixedRotor("BETA", new Permutation("(ALBEVFCYODJWUGNMQTZSKPR) (HIX)", UPPER)));
-        ALL_ROTORS.add(new MovingRotor("I", new Permutation("(AELTPHQXRU) (BKNW) (CMOY) (DFG) (IV) (JZ) (S)", UPPER), "Q"));
-        ALL_ROTORS.add(new MovingRotor("II", new Permutation("(FIXVYOMW) (CDKLHUP) (ESZ) (BJ) (GR) (NT) (A) (Q)", UPPER), "E"));
-        ALL_ROTORS.add(new MovingRotor("III", new Permutation("(ABDHPEJT) (CFLVMZOYQIRWUKXSG) (N)", UPPER), "V"));
-        ALL_ROTORS.add(new MovingRotor("IV", new Permutation("(AEPLIYWCOXMRFZBSTGJQNH) (DV) (KU)", UPPER), "J"));
     }
 
 }

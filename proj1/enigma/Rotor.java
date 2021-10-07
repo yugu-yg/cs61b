@@ -3,12 +3,16 @@ package enigma;
 import static enigma.EnigmaException.*;
 
 /** Superclass that represents a rotor in the enigma machine.
- *  @author
+ *  @author Zachary Zhu
  */
 class Rotor {
 
     /** A rotor named NAME whose permutation is given by PERM. */
     Rotor(String name, Permutation perm) {
+        if (name.indexOf('(')  != -1 || name.indexOf(' ') != -1) {
+            throw new EnigmaException("Name of rotor contains "
+                    + "forbidden chars");
+        }
         _name = name;
         _permutation = perm;
         _setting = 0;
@@ -46,40 +50,35 @@ class Rotor {
 
     /** Return my current setting. */
     int setting() {
-        return _setting; // FIXME
+        return _setting;
     }
 
     /** Set setting() to POSN.  */
     void set(int posn) {
-        _setting = mod(posn, 26);
+        _setting = _permutation.wrap(posn);
     }
 
     /** Set setting() to character CPOSN. */
     void set(char cposn) {
-        _setting = alphabet().toInt(cposn);
-    }
-
-    /** Return the value of P modulo the input SIZE. */
-    int mod(int p, int size) {
-        int r = p % size;
-        if (r < 0) {
-            r += size;
-        }
-        return r;
+        _setting = _permutation.alphabet().toInt(cposn);
     }
 
     /** Return the conversion of P (an integer in the range 0..size()-1)
      *  according to my permutation. */
     int convertForward(int p) {
-        int result = _permutation.permute(p+_setting % size());
-        return mod(result-_setting, size());   // FIXME
+        int newSetting = _permutation.wrap(p + _setting);
+        int permutation = _permutation.permute(newSetting);
+        int result = _permutation.wrap(permutation - _setting);
+        return result;
     }
 
     /** Return the conversion of E (an integer in the range 0..size()-1)
      *  according to the inverse of my permutation. */
     int convertBackward(int e) {
-        int result = _permutation.invert(e+_setting % size());
-        return mod(result-_setting, size());   // FIXME
+        int newSetting = _permutation.wrap(e + _setting);
+        int permutation = _permutation.invert(newSetting);
+        int result = _permutation.wrap(permutation - _setting);
+        return result;
     }
 
     /** Returns true iff I am positioned to allow the rotor to my left
@@ -90,6 +89,7 @@ class Rotor {
 
     /** Advance me one position, if possible. By default, does nothing. */
     void advance() {
+
     }
 
     @Override
@@ -100,10 +100,10 @@ class Rotor {
     /** My name. */
     private final String _name;
 
-    /** The permutation implemnted by this rotor in its 0 position. */
+    /** The permutation implemented by this rotor in its 0 position. */
     private Permutation _permutation;
 
-    /** The setting implemented by the rotor at the current stage. */
+   /** Initial default setting. **/
     private int _setting;
 
 }
