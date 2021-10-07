@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 import static enigma.EnigmaException.*;
 
 /** Enigma simulator.
- *  @author Zachary Zhu
+ *  @author YU
  */
 public final class Main {
 

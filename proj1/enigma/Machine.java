@@ -4,7 +4,7 @@ import java.util.Collection;
 
 
 /** Class that represents a complete enigma machine.
- *  @author Zachary Zhu
+ *  @author YU
  */
 class Machine {
 
