@@ -25,7 +25,14 @@ public class Nybbles {
         if (k < 0 || k >= _n) {
             throw new IndexOutOfBoundsException();
         } else {
-            return 0; // REPLACE WITH SOLUTION
+            int data = _data[k / 8];
+            int shift = 4 * (k % 8);
+            int result = (data >>> shift) & 15;
+            if (result >= 8) {
+                return result - 16;
+            } else {
+                return result;
+            }
         }
     }
 
@@ -37,7 +44,12 @@ public class Nybbles {
         } else if (val < (-MAX_VALUE - 1) || val > MAX_VALUE) {
             throw new IllegalArgumentException();
         } else {
-            _data[0] = 0; // REPLACE WITH SOLUTION
+            int fift = 15;
+            fift = ~(fift << (k * 4));
+            int fift2 = 15;
+            int data = fift2 & val;
+            data = data << (k * 4);
+            _data[k / 8] = (fift & _data[k / 8]) | data;
         }
     }
 
