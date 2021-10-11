@@ -198,15 +198,13 @@ class Board {
     //
     // First, you can explore the consequences of a possible move from
     // position A by making a copy of the Board in position A, and then
-    // modifying that copy.  Since you retain position A, you can return to
-    // it to try other moves from that position.  With this strategy, you
-    // will not need the undo method and can remove it from Board and
-    // its subclasses.
+    // modifying that copy. Since you retain position A, you can return to
+    // it to try other moves from that position.
     //
     // Second, you can explore the consequences of a possible move from
     // position A by making that move on your Board and then, when your
     // analysis of the move is complete, undoing the move to return you to
-    // position A.  This method is more complicated to implement, but has
+    // position A. This method is more complicated to implement, but has
     // the advantage that it can be considerably faster than making copies
     // of the Board (you will need one copy per move tried, which will very
     // quickly be thrown away).
