@@ -109,7 +109,7 @@ class JavaGrowList extends GrowList {
 
     @Override
     public GrowList newList() {
-        return new GeomGrowList();
+        return new JavaGrowList();
     }
 
     private ArrayList<Integer> _list;
