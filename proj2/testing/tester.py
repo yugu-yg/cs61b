@@ -9,7 +9,7 @@ from testing import Tester, contents, interpret_problem
 
 PYTHON = os.environ.get('PYTHON', 'python3')
 
-PROGRAM = PYTHON + " " + join(dirname(__file__), "test-jump61")
+PROGRAM = PYTHON + " " + "./test-jump61"
 
 os.environ.pop('DISPLAY', None)
 
