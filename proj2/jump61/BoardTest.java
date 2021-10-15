@@ -26,7 +26,7 @@ public class BoardTest {
         ConstantBoard C = new ConstantBoard(B);
         assertEquals("bad length", 5, C.size());
         Board D = new Board(C);
-        assertEquals("bad length", 5, C.size());
+        assertEquals("bad length", 5, D.size());
     }
 
     @Test
