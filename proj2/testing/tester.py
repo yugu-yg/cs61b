@@ -89,16 +89,19 @@ class Proj2_Tester(Tester):
 show = None
 keep = False
 try:
-    opts, args = getopt.getopt(sys.argv[1:], '', ['show=', 'keep'])
+    opts, args = getopt.getopt(sys.argv[1:], '', ['show=', 'keep', 'PYTHON='])
     for opt, val in opts:
         if opt == '--show':
             show = int(val)
         elif opt == '--keep':
             keep = True
+        elif opt == '--PYTHON':
+            PYTHON = val
+            PROGRAM = PYTHON + " " + "./test-jump61"
         else:
             assert False
 except:
-    print("Usage: python3 tester.py [--show=N] TEST.in...",
+    print("Usage: python3 tester.py [--show=N] [--PYTHON=python] TEST.in...",
           file=sys.stderr)
     sys.exit(1)
 

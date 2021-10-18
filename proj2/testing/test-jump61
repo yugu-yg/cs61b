@@ -10,6 +10,7 @@ from threading import Thread
 from queue import Queue, Empty, Full
 from getopt import getopt, GetoptError
 from os.path import basename, join, splitext
+from os import chdir
 
 MAX_ERROR_LINES = 1000
 MAX_OUTPUT_LINES = 1000
@@ -25,7 +26,7 @@ MSG_PATN = re.compile(r'(?P<win>{})|{}'.format(WIN_PATN.pattern,
 
 def Usage():
     print("""\
-Usage: test-jump61 OPTIONS FILE-1.in [FILE-2.in]
+Usage: python3 test-jump61 OPTIONS FILE-1.in [FILE-2.in]
 
    For each FILE-1.in, performs the indicated scripts, stores any board
    output (between "===" markers) and "wins" messages in files FILE-1.out.
@@ -460,6 +461,7 @@ base1 = splitext(basename(args[0]))[0]
 out1 = open(base1 + ".out", "w")
 err1 = open(base1 + ".err", "w")
 
+chdir("..")
 cmnd1 = get_run_command(in1, args[0])
 if cmnd1 is None:
     sys.exit(1)
