@@ -117,29 +117,33 @@ public class ArrayHeap<T> {
 
     /** Returns the index of the left child of the node at i. */
     private int getLeftOf(int i) {
-        // TODO
-        return 0;
+        return i * 2;
     }
 
     /** Returns the index of the right child of the node at i. */
     private int getRightOf(int i) {
-        // TODO
-        return 0;
+        return i * 2 + 1;
     }
 
     /** Returns the index of the node that is the parent of the
      *  node at i. */
     private int getParentOf(int i) {
-        // TODO
-        return 0;
+        return i / 2;
     }
 
     /** Returns the index of the node with smaller priority. If one
      * node is null, then returns the index of the non-null node.
      * Precondition: at least one of the nodes is not null. */
     private int min(int index1, int index2) {
-        // TODO
-        return 0;
+        if (getNode(index1) == null) {
+            return index2;
+        } else if (getNode(index2) == null) {
+            return index1;
+        } else if (getNode(index1).priority() <= getNode(index2).priority()) {
+            return index1;
+        } else {
+            return index2;
+        }
     }
 
     /** Returns the item with the smallest priority value, but does
@@ -147,26 +151,49 @@ public class ArrayHeap<T> {
      * priority value, returns any of them. Returns null if heap is
      * empty. */
     public T peek() {
-        // TODO
-        return null;
+        if (size() == 0) {
+            return null;
+        }
+        return getNode(1).item();
     }
 
     /** Bubbles up the node currently at the given index until no longer
      *  needed. */
     private void bubbleUp(int index) {
-        // TODO
+        while (index != 1 && getNode(index).priority() < getNode(index / 2).priority()) {
+            swap(index, index / 2);
+            index = index / 2;
+        }
     }
 
     /** Bubbles down the node currently at the given index until no longer
      *  needed. */
     private void bubbleDown(int index) {
-        // TODO
+        while (index * 2 <= size()) {
+            if (index * 2 + 1 <= size()) {
+                int minChild = min(index * 2, index * 2 + 1);
+                if (min(minChild, index) == minChild) {
+                    swap(index, minChild);
+                    index = minChild;
+                } else {
+                    return;
+                }
+            } else {
+                if (min(index, index * 2) != index) {
+                    swap(index, index * 2);
+                    index = index * 2;
+                } else {
+                    return;
+                }
+            }
+        }
     }
 
     /** Inserts an item with the given priority value. Assume that item is
      * not already in the heap. Same as enqueue, or offer. */
     public void insert(T item, double priority) {
-        // TODO
+        setNode(size() + 1, new Node(item, priority));
+        bubbleUp(size());
     }
 
     /** Returns the element with the smallest priority value, and removes
@@ -174,8 +201,14 @@ public class ArrayHeap<T> {
      * removes any of them. Returns null if the heap is empty. Same as
      * dequeue, or poll. */
     public T removeMin() {
-        // TODO
-        return null;
+        if (size() == 0) {
+            return null;
+        }
+        Node removal = getNode(1);
+        swap(1, size());
+        removeNode(size());
+        bubbleDown(1);
+        return removal.item();
     }
 
     /** Changes the node in this heap with the given item to have the given
@@ -183,6 +216,14 @@ public class ArrayHeap<T> {
      * same item. Does nothing if the item is not in the heap. Check for
      * item equality with .equals(), not == */
     public void changePriority(T item, double priority) {
-        // TODO
+        int index = 0;
+        for (int i = 1; i <= size(); i ++) {
+            if (item.equals(getNode(i).item())) {
+                index = i;
+            }
+        }
+        getNode(index).setPriority(priority);
+        bubbleUp(index);
+        bubbleDown(index);
     }
 }
