@@ -6,27 +6,57 @@ import java.util.Stack;
 
 /**
  * Implementation of a BST based String Set.
- * @author
+ * @author Yu
  */
-public class BSTStringSet implements StringSet, Iterable<String> {
+public class BSTStringSet implements SortedStringSet, Iterable<String> {
     /** Creates a new empty set. */
     public BSTStringSet() {
         _root = null;
     }
 
-    @Override
-    public void put(String s) {
-        // FIXME: PART A
+    public Node helperPut(String s, Node p) {
+        if (p == null) {
+            return new Node(s);
+        } else {
+            if (s.compareTo(p.s) < 0) {
+                p.left = helperPut(s, p.left);
+            }
+            if (s.compareTo(p.s) > 0) {
+                p.right = helperPut(s, p.right);
+            }
+        }
+        return p;
     }
 
+    public void put(String s) {
+        _root = helperPut(s, _root);
+    }
+
+    public boolean helperContains (String s, Node root) {
+        if (root == null) {
+            return false;
+        } else if (s.compareTo(root.s) == 0) {
+            return true;
+        } else if (s.compareTo(root.s) > 0) {
+            return helperContains(s, root.right);
+        } else if (s.compareTo(root.s) < 0) {
+            return helperContains(s, root.left);
+        }
+        return false;
+    }
     @Override
     public boolean contains(String s) {
-        return false; // FIXME: PART A
+        return helperContains(s, _root);
     }
 
     @Override
     public List<String> asList() {
-        return null; // FIXME: PART A. MUST BE IN SORTED ORDER, ASCENDING
+        List<String> list = new ArrayList<>();
+        BSTIterator iter = new BSTIterator(_root);
+        while (iter.hasNext()) {
+            list.add(iter.next());
+        }
+        return list;
     }
 
 
@@ -95,8 +125,7 @@ public class BSTStringSet implements StringSet, Iterable<String> {
         return new BSTIterator(_root);
     }
 
-    // FIXME: UNCOMMENT THE NEXT LINE FOR PART B
-    // @Override
+
     public Iterator<String> iterator(String low, String high) {
         return null;  // FIXME: PART B (OPTIONAL)
     }
