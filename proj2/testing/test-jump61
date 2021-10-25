@@ -26,7 +26,7 @@ MSG_PATN = re.compile(r'(?P<win>{})|{}'.format(WIN_PATN.pattern,
 
 def Usage():
     print("""\
-Usage: python3 test-jump61 OPTIONS FILE-1.in [FILE-2.in]
+Usage: test-jump61 OPTIONS FILE-1.in [FILE-2.in]
 
    For each FILE-1.in, performs the indicated scripts, stores any board
    output (between "===" markers) and "wins" messages in files FILE-1.out.
@@ -461,16 +461,16 @@ base1 = splitext(basename(args[0]))[0]
 out1 = open(base1 + ".out", "w")
 err1 = open(base1 + ".err", "w")
 
-chdir("..")
 cmnd1 = get_run_command(in1, args[0])
 if cmnd1 is None:
     sys.exit(1)
+chdir("..")
 prog1 = Prog(cmnd1, "[1]", commands_in=in1,
              output_dest=out1, error_dest = err1, logging_queue=logger)
 
 if in2:
-    out2 = open(base2 + ".out", "w")
-    err2 = open(base2 + ".err", "w")
+    out2 = open("testing/" + base2 + ".out", "w")
+    err2 = open("testing/" + base2 + ".err", "w")
 
     cmnd2 = get_run_command(in2, args[1])
     if cmnd2 is None:
