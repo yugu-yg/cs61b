@@ -353,13 +353,13 @@ class Board {
                 int spots = get(sqNum(r, c)).getSpots();
                 switch (player) {
                     case RED:
-                        out.format("%d%nr ",spots);
+                        out.format("%dr ",spots);
                         break;
                     case BLUE:
-                        out.format("%d%nb ",spots);
+                        out.format("%db ",spots);
                         break;
                     case WHITE:
-                        out.format("%d%n- ",spots);
+                        out.format("%d- ",spots);
                         break;
                     default:
                         System.out.print("Error");
