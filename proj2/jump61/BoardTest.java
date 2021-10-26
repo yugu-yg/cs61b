@@ -12,7 +12,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /** Unit tests of Boards.
- *  @author
+ *  @author YU
  */
 
 public class BoardTest {

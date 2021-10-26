@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.ArrayDeque;
 import java.util.Formatter;
 
+import java.util.Stack;
 import java.util.function.Consumer;
 
 import static jump61.Side.*;
@@ -23,7 +24,7 @@ import static jump61.Square.square;
  *  A Board may be given a notifier---a Consumer<Board> whose
  *  .accept method is called whenever the Board's contents are changed.
  *
- *  @author
+ *  @author Yu
  */
 class Board {
 
@@ -35,14 +36,21 @@ class Board {
     /** An N x N board in initial configuration. */
     Board(int N) {
         this();
-        // FIXME
+        _board = new Square[N][N];
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
+                _board[r][c] = Square.square(WHITE, 1);
+            }
+        }
+        _history = new Stack<Board>();
+        _numMoves = 0;
     }
 
     /** A board whose initial contents are copied from BOARD0, but whose
      *  undo history is clear, and whose notifier does nothing. */
     Board(Board board0) {
         this(board0.size());
-        // FIXME
+        this.internalCopy(board0);
         _readonlyBoard = new ConstantBoard(this);
     }
 
@@ -54,25 +62,33 @@ class Board {
     /** (Re)initialize me to a cleared board with N squares on a side. Clears
      *  the undo history and sets the number of moves to 0. */
     void clear(int N) {
-        // FIXME
+        Board clearBoard = new Board(N);
+        _board = clearBoard._board;
         announce();
     }
 
     /** Copy the contents of BOARD into me. */
     void copy(Board board) {
-        // FIXME
+        internalCopy(board);
+        _history = board._history;
+        _numMoves = board._numMoves;
     }
 
     /** Copy the contents of BOARD into me, without modifying my undo
      *  history. Assumes BOARD and I have the same size. */
     private void internalCopy(Board board) {
         assert size() == board.size();
-        // FIXME
+        for (int r = 1; r <= board.size(); r++) {
+            for (int c = 1; c <= board.size(); c++) {
+                int n = sqNum(r, c);
+                this.set(r, c, board.get(n).getSpots(), board.get(n).getSide());
+            }
+        }
     }
 
     /** Return the number of rows and of columns of THIS. */
     int size() {
-        return 6; // FIXME
+        return _board.length;
     }
 
     /** Returns the contents of the square at row R, column C
@@ -85,12 +101,18 @@ class Board {
      *  squares in row 1 number 0 - size()-1, in row 2 numbered
      *  size() - 2*size() - 1, etc. */
     Square get(int n) {
-        return null; // FIXME
+        return _board[row(n) - 1][col(n) - 1];
     }
 
     /** Returns the total number of spots on the board. */
     int numPieces() {
-        return size() * size(); // FIXME
+        int sum = 0;
+        for (int r = 0; r < size(); r++) {
+            for (int c = 0; c < size(); c++) {
+                sum += _board[r][c].getSpots();
+            }
+        }
+        return sum;
     }
 
     /** Returns the Side of the player who would be next to move.  If the
@@ -144,34 +166,86 @@ class Board {
     /** Returns true iff it would currently be legal for PLAYER to add a spot
      *  to square #N. */
     boolean isLegal(Side player, int n) {
-        return true; // FIXME
+        if (!exists(n)) {
+            return false;
+        }
+
+        Side side = this.get(n).getSide();
+        if (!player.playableSquare(side)) {
+            return false;
+        }
+        return true;
     }
 
     /** Returns true iff PLAYER is allowed to move at this point. */
     boolean isLegal(Side player) {
-        return true; // FIXME
+        for (int n = 0; n < size() * size(); n++) {
+            if (isLegal(player, n)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Returns the winner of the current position, if the game is over,
      *  and otherwise null. */
     final Side getWinner() {
-        return null;  // FIXME
+        int N = size() * size();
+        if (numOfSide(RED) == N) {
+            return RED;
+        } else if (numOfSide(BLUE) == N) {
+            return BLUE;
+        } else {
+            return null;
+        }
     }
 
     /** Return the number of squares of given SIDE. */
     int numOfSide(Side side) {
-        return 0; // FIXME
+        int num = 0;
+        for (int n = 0; n < size() * size(); n++) {
+            if (side == get(n).getSide()) {
+                num += 1;
+            }
+        }
+        return num;
     }
 
     /** Add a spot from PLAYER at row R, column C.  Assumes
      *  isLegal(PLAYER, R, C). */
     void addSpot(Side player, int r, int c) {
-        // FIXME
+        markUndo();
+        _numMoves += 1;
+        addSpot(player, sqNum(r, c));
+        announce();
     }
 
     /** Add a spot from PLAYER at square #N.  Assumes isLegal(PLAYER, N). */
     void addSpot(Side player, int n) {
-        // FIXME
+        if (getWinner() != null) {
+            return;
+        }
+        int spots = get(n).getSpots();
+        int neighbours = this.neighbors(n);
+        int r = row(n);
+        int c = col(n);
+        if (spots + 1 > neighbours) {
+            this.set(r, c, 1, player);
+            if (exists(r, c + 1)) {
+                addSpot(player, sqNum(r, c + 1));
+            }
+            if (exists(r, c - 1)) {
+                addSpot(player, sqNum(r, c - 1));
+            }
+            if (exists(r + 1, c)) {
+                addSpot(player, sqNum(r + 1, c));
+            }
+            if (exists(r - 1, c)) {
+                addSpot(player, sqNum(r - 1, c));
+            }
+        } else {
+            this.set(r, c, spots + 1, player);
+        }
     }
 
     /** Set the square at row R, column C to NUM spots (0 <= NUM), and give
@@ -191,7 +265,7 @@ class Board {
     /** Set the square #N to NUM spots (0 <= NUM), and give it color PLAYER
      *  if NUM > 0 (otherwise, white). Does not announce changes. */
     private void internalSet(int n, int num, Side player) {
-        // FIXME
+        _board[row(n) - 1][col(n) - 1] = Square.square(player, num);
     }
 
     // There are two obvious ways to conduct a game-tree search in the AI.
@@ -213,12 +287,16 @@ class Board {
      *  can only undo back to the last point at which the undo history
      *  was cleared, or the construction of this Board. */
     void undo() {
-        // FIXME
+        if (!_history.empty()) {
+            Board temp = _history.pop();
+            internalCopy(temp);
+        }
     }
 
     /** Record the beginning of a move in the undo history. */
     private void markUndo() {
-        // FIXME
+        Board board = new Board(this);
+        _history.push(board);
     }
 
     /** Add DELTASPOTS spots of side PLAYER to row R, column C,
@@ -237,17 +315,60 @@ class Board {
      *  here to cut down on allocations. */
     private final ArrayDeque<Integer> _workQueue = new ArrayDeque<>();
 
+
     /** Do all jumping on this board, assuming that initially, S is the only
      *  square that might be over-full. */
     private void jump(int S) {
-        // FIXME
+        int spots = get(S).getSpots();
+        int neighbours = this.neighbors(S);
+        Side player = get(S).getSide();
+        int r = row(S);
+        int c = col(S);
+        if (spots > neighbours) {
+            this.set(r, c, 1, player);
+            if (exists(r, c + 1)) {
+                addSpot(player, sqNum(r, c + 1));
+            }
+            if (exists(r, c - 1)) {
+                addSpot(player, sqNum(r, c - 1));
+            }
+            if (exists(r + 1, c)) {
+                addSpot(player, sqNum(r + 1, c));
+            }
+            if (exists(r - 1, c)) {
+                addSpot(player, sqNum(r - 1, c));
+            }
+        }
     }
 
     /** Returns my dumped representation. */
     @Override
     public String toString() {
         Formatter out = new Formatter();
-        // FIXME
+        out.format("===\n");
+        for (int r = 1; r <= size(); r++) {
+            out.format("    ");
+            for (int c = 1; c <= size(); c++) {
+                Side player = get(sqNum(r, c)).getSide();
+                int spots = get(sqNum(r, c)).getSpots();
+                switch (player) {
+                    case RED:
+                        out.format("%d%nr ",spots);
+                        break;
+                    case BLUE:
+                        out.format("%d%nb ",spots);
+                        break;
+                    case WHITE:
+                        out.format("%d%n- ",spots);
+                        break;
+                    default:
+                        System.out.print("Error");
+                        break;
+                }
+            }
+            out.format("\n");
+        }
+        out.format("===");
         return out.toString();
     }
 
@@ -298,7 +419,7 @@ class Board {
             return false;
         } else {
             Board B = (Board) obj;
-            return this == obj;  // FIXME
+            return (B._board == this._board && B._history == this._history && B._numMoves == this._numMoves);
         }
     }
 
@@ -327,6 +448,10 @@ class Board {
     /** Use _notifier.accept(B) to announce changes to this board. */
     private Consumer<Board> _notifier;
 
-    // FIXME: other instance variables here.
+    private Square[][] _board;
+
+    private Stack<Board> _history = new Stack<Board>();
+
+    private int _numMoves = 0;
 
 }
