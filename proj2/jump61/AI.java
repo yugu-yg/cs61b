@@ -1,16 +1,4 @@
-// This file contains definitions for an OPTIONAL part of your project.  If you
-// choose not to do the optional point, you can delete this file from your
-// project.
-
-// This file contains a SUGGESTION for the structure of your program.  You
-// may change any of it, or add additional files to this directory (package),
-// as long as you conform to the project specification.
-
-// Comments that start with "//" are intended to be removed from your
-// solutions.
 package jump61;
-
-import afu.org.checkerframework.checker.igj.qual.I;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -81,7 +69,8 @@ class AI extends Player {
             for (int move : possibleMoves) {
                 Board copyBoard = new Board(board);
                 copyBoard.addSpot(getSide(), move);
-                int opponent = minMax(copyBoard, depth - 1, false, -1, alpha, beta);
+                int opponent = minMax(copyBoard, depth - 1, false,
+                        -1, alpha, beta);
                 copyBoard.undo();
                 if (-opponent > alpha) {
                     alpha = -opponent;
@@ -102,7 +91,8 @@ class AI extends Player {
             for (int move : possibleMoves) {
                 Board copyBoard = new Board(board);
                 copyBoard.addSpot(getSide(), move);
-                int opponent = minMax(copyBoard, depth - 1, false, 1, alpha, beta);
+                int opponent = minMax(copyBoard, depth - 1, false,
+                        1, alpha, beta);
                 copyBoard.undo();
                 if (-opponent <= alpha) {
                     return minScore;
@@ -125,10 +115,10 @@ class AI extends Player {
      *  Use WINNINGVALUE to indicate a win for Red and -WINNINGVALUE to
      *  indicate a win for Blue. */
     private int staticEval(Board b) {
-        if (b.getWinner()== RED) {
+        if (b.getWinner() == RED) {
             return _winningValue;
         }
-        if (b.getWinner()== BLUE) {
+        if (b.getWinner() == BLUE) {
             return -_winningValue;
         }
 
@@ -137,6 +127,7 @@ class AI extends Player {
         return myScore - oppScore;
     }
 
+    /** all possible moves. */
     private ArrayList<Integer> possibleMove() {
         ArrayList<Integer> possibleMove = new ArrayList<>();
         for (int n = 0; n < getBoard().size() * getBoard().size(); n++) {
@@ -152,5 +143,6 @@ class AI extends Player {
     /** Used to convey moves discovered by minMax. */
     private int _foundMove;
 
-    private final static int _winningValue = Integer.MAX_VALUE;
+    /** Define winning value. */
+    private static int _winningValue = Integer.MAX_VALUE;
 }

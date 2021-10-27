@@ -1,12 +1,5 @@
-// This file contains a SUGGESTION for the structure of your program.  You
-// may change any of it, or add additional files to this directory (package),
-// as long as you conform to the project specification.
-
-// Comments that start with "//" are intended to be removed from your
-// solutions.
 package jump61;
 
-import java.util.Arrays;
 import java.util.ArrayDeque;
 import java.util.Formatter;
 
@@ -14,7 +7,6 @@ import java.util.Stack;
 import java.util.function.Consumer;
 
 import static jump61.Side.*;
-import static jump61.Square.square;
 
 /** Represents the state of a Jump61 game.  Squares are indexed either by
  *  row and column (between 1 and size()), or by square number, numbering
@@ -268,21 +260,6 @@ class Board {
         _board[row(n) - 1][col(n) - 1] = Square.square(player, num);
     }
 
-    // There are two obvious ways to conduct a game-tree search in the AI.
-    //
-    // First, you can explore the consequences of a possible move from
-    // position A by making a copy of the Board in position A, and then
-    // modifying that copy. Since you retain position A, you can return to
-    // it to try other moves from that position.
-    //
-    // Second, you can explore the consequences of a possible move from
-    // position A by making that move on your Board and then, when your
-    // analysis of the move is complete, undoing the move to return you to
-    // position A. This method is more complicated to implement, but has
-    // the advantage that it can be considerably faster than making copies
-    // of the Board (you will need one copy per move tried, which will very
-    // quickly be thrown away).
-
     /** Undo the effects of one move (that is, one addSpot command).  One
      *  can only undo back to the last point at which the undo history
      *  was cleared, or the construction of this Board. */
@@ -351,18 +328,18 @@ class Board {
                 Side player = get(sqNum(r, c)).getSide();
                 int spots = get(sqNum(r, c)).getSpots();
                 switch (player) {
-                    case RED:
-                        out.format("%dr ",spots);
-                        break;
-                    case BLUE:
-                        out.format("%db ",spots);
-                        break;
-                    case WHITE:
-                        out.format("%d- ",spots);
-                        break;
-                    default:
-                        System.out.print("Error");
-                        break;
+                case RED:
+                    out.format("%dr ", spots);
+                    break;
+                case BLUE:
+                    out.format("%db ", spots);
+                    break;
+                case WHITE:
+                    out.format("%d- ", spots);
+                    break;
+                default:
+                    System.out.print("Error");
+                    break;
                 }
             }
             out.format("\n");
@@ -418,7 +395,9 @@ class Board {
             return false;
         } else {
             Board B = (Board) obj;
-            return (B._board == this._board && B._history == this._history && B._numMoves == this._numMoves);
+            return (B._board == this._board
+                    && B._history == this._history
+                    && B._numMoves == this._numMoves);
         }
     }
 
@@ -447,10 +426,13 @@ class Board {
     /** Use _notifier.accept(B) to announce changes to this board. */
     private Consumer<Board> _notifier;
 
+    /** _board. */
     private Square[][] _board;
 
+    /** _history. */
     private Stack<Board> _history = new Stack<Board>();
 
+    /** _numMoves. */
     private int _numMoves = 0;
 
 }
