@@ -288,8 +288,7 @@ class Board {
      *  was cleared, or the construction of this Board. */
     void undo() {
         if (!_history.empty()) {
-            Board temp = _history.pop();
-            internalCopy(temp);
+            this.internalCopy(_history.pop());
         }
     }
 

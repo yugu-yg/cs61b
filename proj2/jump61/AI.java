@@ -10,6 +10,8 @@
 // solutions.
 package jump61;
 
+import afu.org.checkerframework.checker.igj.qual.I;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -42,13 +44,11 @@ class AI extends Player {
      *  from the current position. Assumes the game is not over. */
     private int searchForMove() {
         Board work = new Board(getBoard());
-        int value;
         assert getSide() == work.whoseMove();
-        _foundMove = -1;
         if (getSide() == RED) {
-            value = 0; // FIXME
+            minMax(getBoard(), 5, true, 1, -_winningValue, _winningValue);
         } else {
-            value = 0; // FIXME
+            minMax(getBoard(), 5, true, -1, -_winningValue, _winningValue);
         }
         return _foundMove;
     }
@@ -63,19 +63,94 @@ class AI extends Player {
      *  on BOARD, does not set _foundMove. */
     private int minMax(Board board, int depth, boolean saveMove,
                        int sense, int alpha, int beta) {
-        return 0; // FIXME
+        if (board.getWinner() != null) {
+            if (sense == 1) {
+                return _winningValue;
+            } else {
+                return -_winningValue;
+            }
+        }
+
+        if (depth == 0) {
+            return staticEval(getBoard());
+        }
+
+        ArrayList<Integer> possibleMoves = possibleMove();
+        if (sense == 1) {
+            int maxScore = -_winningValue;
+            for (int move : possibleMoves) {
+                Board copyBoard = new Board(board);
+                copyBoard.addSpot(getSide(), move);
+                int opponent = minMax(copyBoard, depth - 1, false, -1, alpha, beta);
+                copyBoard.undo();
+                if (-opponent > alpha) {
+                    alpha = -opponent;
+                }
+                if (-opponent >= beta) {
+                    return maxScore;
+                }
+                if (-opponent > maxScore) {
+                    maxScore = -opponent;
+                    if (saveMove) {
+                        _foundMove = move;
+                    }
+                }
+            }
+            return maxScore;
+        } else {
+            int minScore = _winningValue;
+            for (int move : possibleMoves) {
+                Board copyBoard = new Board(board);
+                copyBoard.addSpot(getSide(), move);
+                int opponent = minMax(copyBoard, depth - 1, false, 1, alpha, beta);
+                copyBoard.undo();
+                if (-opponent <= alpha) {
+                    return minScore;
+                }
+                if (-opponent < beta) {
+                    beta = -opponent;
+                }
+                if (-opponent < minScore) {
+                    minScore = -opponent;
+                    if (saveMove) {
+                        _foundMove = move;
+                    }
+                }
+            }
+            return minScore;
+        }
     }
 
     /** Return a heuristic estimate of the value of board position B.
      *  Use WINNINGVALUE to indicate a win for Red and -WINNINGVALUE to
      *  indicate a win for Blue. */
-    private int staticEval(Board b, int winningValue) {
-        return 0; // FIXME
+    private int staticEval(Board b) {
+        if (b.getWinner()== RED) {
+            return _winningValue;
+        }
+        if (b.getWinner()== BLUE) {
+            return -_winningValue;
+        }
+
+        int myScore = b.numOfSide(getSide());
+        int oppScore = b.numOfSide(getSide().opposite());
+        return myScore - oppScore;
     }
 
+    private ArrayList<Integer> possibleMove() {
+        ArrayList<Integer> possibleMove = new ArrayList<>();
+        for (int n = 0; n < getBoard().size() * getBoard().size(); n++) {
+            if (getBoard().isLegal(getSide(), n)) {
+                possibleMove.add(n);
+            }
+        }
+        return possibleMove;
+    }
     /** A random-number generator used for move selection. */
     private Random _random;
 
     /** Used to convey moves discovered by minMax. */
     private int _foundMove;
+
+    private final static int _winningValue = Integer.MAX_VALUE;
 }

@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import static jump61.Utils.*;
 
 /** A Player that gets its moves from manual input.
- *  @author
+ *  @author Yu
  */
 class HumanPlayer extends Player {
 
