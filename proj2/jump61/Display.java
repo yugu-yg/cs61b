@@ -3,7 +3,6 @@ package jump61;
 import ucb.gui2.TopLevel;
 import ucb.gui2.LayoutSpec;
 
-import java.io.PrintWriter;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import static jump61.Side.*;
