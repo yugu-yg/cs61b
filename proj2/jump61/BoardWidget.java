@@ -83,13 +83,68 @@ class BoardWidget extends Pad {
         if (_board == null) {
             return;
         }
-        // FIXME
+        g.setColor(NEUTRAL);
+        g.fillRect(0, 0, getWidth(), getHeight());
+        g.fillRect(0, 0, _side, _side);
+
+
+        g.setColor(SEPARATOR_COLOR);
+        for (int i = 0; i <= _side; i += SQUARE_SEP) {
+            g.fillRect(0, i, _side, SEPARATOR_SIZE);
+            g.fillRect(i, 0, SEPARATOR_SIZE, _side);
+        }
+
+        for (int r = 1; r <= _board.size(); r++) {
+            for (int c = 1; c <= _board.size(); c++) {
+                displaySpots(g, r, c);
+            }
+        }
     }
 
     /** Color and display the spots on the square at row R and column C
      *  on G.  (Used by paintComponent). */
     private void displaySpots(Graphics2D g, int r, int c) {
-        // FIXME
+        Side side = _board.get(r, c).getSide();
+        int spots = _board.get(r, c).getSpots();
+        switch (side) {
+        case RED:
+            g.setColor(RED_TINT);
+            break;
+        case BLUE:
+            g.setColor(BLUE_TINT);
+            break;
+        case WHITE:
+            g.setColor(NEUTRAL);
+            break;
+        default:
+            System.out.println("Error");
+            break;
+        }
+        int x = (r - 1) * (SQUARE_SIZE + SEPARATOR_SIZE) + SEPARATOR_SIZE;
+        int y = (c - 1) * (SQUARE_SIZE + SEPARATOR_SIZE) + SEPARATOR_SIZE;
+        g.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+
+        int spotX = 0;
+        int spotY = 0;
+        for (int i = 0; i < spots; i++) {
+            if (i == 0) {
+                spotX = x + SPOT_MARGIN;
+                spotY = y + SPOT_MARGIN;
+            }
+            if (i == 1) {
+                spotX = x + SQUARE_SIZE - SPOT_MARGIN;
+                spotY = y + SPOT_MARGIN;
+            }
+            if (i == 2) {
+                spotX = x + SQUARE_SIZE - SPOT_MARGIN;
+                spotY = y + SQUARE_SIZE - SPOT_MARGIN;
+            }
+            if (i == 3) {
+                spotX = x +  SPOT_MARGIN;
+                spotY = y +  SQUARE_SIZE -  SPOT_MARGIN;
+            }
+            spot(g, spotX, spotY);
+        }
     }
 
     /** Draw one spot centered at position (X, Y) on G. */
@@ -100,16 +155,11 @@ class BoardWidget extends Pad {
 
     /** Respond to the mouse click depicted by EVENT. */
     public void doClick(String dummy, MouseEvent event) {
-        // x and y coordinates relative to the upper-left corner of the
-        // upper-left square (increasing y is down).
         int x = event.getX() - SEPARATOR_SIZE,
             y = event.getY() - SEPARATOR_SIZE;
-        // FIXME:
-        // REPLACE THE FOLLOWING WITH COMPUTATION OF r AND c FROM x and y,
-        // AND SEND THE APPROPRIATE COMMAND TO OUR GAME, IF THE EVENT
-        // OCCURS AT A VALID POSITION.  OTHERWISE, DOES NOTHING.
-        int r = 1;
-        int c = 1;
+
+        int r = ((x - SEPARATOR_SIZE) / (SQUARE_SIZE +  SEPARATOR_SIZE)) + 1;
+        int c = ((y - SEPARATOR_SIZE) / (SQUARE_SIZE +  SEPARATOR_SIZE)) + 1;
         _commandQueue.offer(String.format("%d %d", r, c));
     }
 

@@ -24,6 +24,12 @@ class Display extends TopLevel implements View, CommandSource, Reporter {
 
         addMenuButton("Game->Quit", this::quit);
         addMenuButton("Game->New Game", this::newGame);
+        addMenuButton("Game->Help", this::help);
+        addMenuButton("Setting->Board Size", this::setSize);
+        addMenuButton("Setting->Auto Red", this::autoRed);
+        addMenuButton("Setting->Auto Blue", this::autoBlue);
+        addMenuButton("Setting->Manual Red", this::manualRed);
+        addMenuButton("Setting->Manual Blue", this::manualBlue);
 
         _boardWidget = new BoardWidget(_commandQueue);
         add(_boardWidget, new LayoutSpec("y", 1, "width", 2));
@@ -40,6 +46,37 @@ class Display extends TopLevel implements View, CommandSource, Reporter {
         _commandQueue.offer("new");
     }
 
+    /** Response to "Help" button click. */
+    void help(String dummy) {
+        _commandQueue.offer("help");
+    }
+
+    /** Response to "Size" button click. */
+    void setSize(String dummy) {
+        String n = getTextInput("SET SIZE", "SIZE", "", "");
+        Board board = new Board(Integer.parseInt(n));
+        this.update(board);
+    }
+
+    /** Response to "Auto Red" button click. */
+    void autoRed(String dummy) {
+        setSize(dummy);
+        _commandQueue.offer("auto red");
+    }
+    /** Response to "Auto Blue" button click. */
+    void autoBlue(String dummy) {
+        _commandQueue.offer("auto blue");
+    }
+
+    /** Response to "manual red" button click. */
+    void manualRed(String dummy) {
+        _commandQueue.offer("manual red");
+    }
+
+    /** Response to "manual blue" button click. */
+    void manualBlue(String dummy) {
+        _commandQueue.offer("manual blue");
+    }
 
     @Override
     public void update(Board board) {

@@ -5,13 +5,16 @@ import java.util.Random;
 
 import static jump61.Side.*;
 
-/** An automated Player.
- *  @author P. N. Hilfinger
+/**
+ * An automated Player.
+ *
+ * @author P. N. Hilfinger
  */
 class AI extends Player {
 
-    /** A new player of GAME initially COLOR that chooses moves automatically.
-     *  SEED provides a random-number seed used for choosing moves.
+    /**
+     * A new player of GAME initially COLOR that chooses moves automatically.
+     * SEED provides a random-number seed used for choosing moves.
      */
     AI(Game game, Side color, long seed) {
         super(game, color);
@@ -28,121 +31,125 @@ class AI extends Player {
         return String.format("%d %d", board.row(choice), board.col(choice));
     }
 
-    /** Return a move after searching the game tree to DEPTH>0 moves
-     *  from the current position. Assumes the game is not over. */
+    /**
+     * Return a move after searching the game tree to DEPTH>0 moves
+     * from the current position. Assumes the game is not over.
+     */
     private int searchForMove() {
         Board work = new Board(getBoard());
         assert getSide() == work.whoseMove();
-        if (getSide() == RED) {
-            minMax(getBoard(), 5, true, 1, -_winningValue, _winningValue);
+        ArrayList<Integer> moves = new ArrayList<Integer>();
+        minMax(new Board(getBoard()), 5,  -_winningValue, moves);
+
+        int r;
+        int c;
+        ArrayList<int[]> possibleMoves;
+        if (moves.size() == 0) {
+            possibleMoves = new ArrayList<int[]>();
+            for (int i = 1; i <= this.getBoard().size(); i++) {
+                for (int j = 1; j <= this.getBoard().size(); j++) {
+                    if (this.getBoard().isLegal(this.getSide(), i, j)) {
+                        possibleMoves.add(new int[]{i, j});
+                    }
+                }
+            }
+            r = possibleMoves.get(0)[0];
+            c = possibleMoves.get(0)[1];
         } else {
-            minMax(getBoard(), 5, true, -1, -_winningValue, _winningValue);
+            r = this.getBoard().row(moves.get(0));
+            c = this.getBoard().col(moves.get(0));
         }
-        return _foundMove;
+        return getBoard().sqNum(r, c);
     }
 
 
-    /** Find a move from position BOARD and return its value, recording
-     *  the move found in _foundMove iff SAVEMOVE. The move
-     *  should have maximal value or have value > BETA if SENSE==1,
-     *  and minimal value or value < ALPHA if SENSE==-1. Searches up to
-     *  DEPTH levels.  Searching at level 0 simply returns a static estimate
-     *  of the board value and does not set _foundMove. If the game is over
-     *  on BOARD, does not set _foundMove. */
-    private int minMax(Board board, int depth, boolean saveMove,
-                       int sense, int alpha, int beta) {
+    /**
+     * Find a move from position b and return its value, recording
+     * the move found in _foundMove iff SAVEMOVE. The move
+     * should have maximal value or have value > BETA if SENSE==1,
+     * and minimal value or value < ALPHA if SENSE==-1. Searches up to
+     * DEPTH levels.  Searching at level 0 simply returns a static estimate
+     * of the board value and does not set _foundMove. If the game is over
+     * on BOARD, does not set _foundMove.
+     */
+    /**
+     * @param board this is board of table
+     * @param moves this is moves
+     * @param depth this is depth
+     * @param alpha this is alpha
+     * @return bestSoFar this is the score
+     */
+    private int minMax(Board board, int depth, int alpha,
+                       ArrayList<Integer> moves) {
+        Side p = getSide();
         if (board.getWinner() != null) {
-            if (sense == 1) {
-                return _winningValue;
+            if (board.getWinner().equals(p)) {
+                return Integer.MAX_VALUE;
             } else {
-                return -_winningValue;
+                return -Integer.MAX_VALUE;
+            }
+        }
+
+        ArrayList<int[]> possibleMoves = new ArrayList<int[]>();
+        for (int r = 1; r <= this.getBoard().size(); r++) {
+            for (int c = 1; c <= this.getBoard().size(); c++) {
+                if (board.isLegal(p, r, c)) {
+                    possibleMoves.add(new int[]{r, c});
+                }
             }
         }
 
         if (depth == 0) {
-            return staticEval(getBoard());
+            int bestEval = -Integer.MAX_VALUE;
+            for (int[] move : possibleMoves) {
+                Board moveBoard = new Board(board);
+                moveBoard.addSpot(p, move[0], move[1]);
+                int heuristic = this.staticEval(moveBoard);
+                if (heuristic > bestEval) {
+                    bestEval = heuristic;
+                    moves.clear();
+                    moves.add(board.sqNum(move[0], move[1]));
+                }
+            }
+            return bestEval;
         }
+        int bestSoFar = -Integer.MAX_VALUE;
 
-        ArrayList<Integer> possibleMoves = possibleMove();
-        if (sense == 1) {
-            int maxScore = -_winningValue;
-            for (int move : possibleMoves) {
-                Board copyBoard = new Board(board);
-                copyBoard.addSpot(getSide(), move);
-                int opponent = minMax(copyBoard, depth - 1, false,
-                        -1, alpha, beta);
-                copyBoard.undo();
-                if (-opponent > alpha) {
-                    alpha = -opponent;
-                }
-                if (-opponent >= beta) {
-                    return maxScore;
-                }
-                if (-opponent > maxScore) {
-                    maxScore = -opponent;
-                    if (saveMove) {
-                        _foundMove = move;
-                    }
+        for (int[] move : possibleMoves) {
+            Board newBoard = new Board(board);
+            newBoard.addSpot(p, move[0], move[1]);
+            ArrayList<Integer> x = new ArrayList<Integer>();
+            int response = minMax(newBoard, depth - 1, -bestSoFar, x);
+            if (-response > bestSoFar) {
+                moves.clear();
+                moves.add(this.getBoard().sqNum(move[0], move[1]));
+                bestSoFar = -response;
+                if (-response >= alpha) {
+                    break;
                 }
             }
-            return maxScore;
-        } else {
-            int minScore = _winningValue;
-            for (int move : possibleMoves) {
-                Board copyBoard = new Board(board);
-                copyBoard.addSpot(getSide(), move);
-                int opponent = minMax(copyBoard, depth - 1, false,
-                        1, alpha, beta);
-                copyBoard.undo();
-                if (-opponent <= alpha) {
-                    return minScore;
-                }
-                if (-opponent < beta) {
-                    beta = -opponent;
-                }
-                if (-opponent < minScore) {
-                    minScore = -opponent;
-                    if (saveMove) {
-                        _foundMove = move;
-                    }
-                }
-            }
-            return minScore;
         }
+        return bestSoFar;
     }
 
-    /** Return a heuristic estimate of the value of board position B.
-     *  Use WINNINGVALUE to indicate a win for Red and -WINNINGVALUE to
-     *  indicate a win for Blue. */
+    /**
+     * Return a heuristic estimate of the value of board position B.
+     * Use WINNINGVALUE to indicate a win for Red and -WINNINGVALUE to
+     * indicate a win for Blue.
+     */
     private int staticEval(Board b) {
-        if (b.getWinner() == RED) {
-            return _winningValue;
-        }
-        if (b.getWinner() == BLUE) {
-            return -_winningValue;
-        }
-
         int myScore = b.numOfSide(getSide());
         int oppScore = b.numOfSide(getSide().opposite());
         return myScore - oppScore;
     }
 
-    /** all possible moves. */
-    private ArrayList<Integer> possibleMove() {
-        ArrayList<Integer> possibleMove = new ArrayList<>();
-        for (int n = 0; n < getBoard().size() * getBoard().size(); n++) {
-            if (getBoard().isLegal(getSide(), n)) {
-                possibleMove.add(n);
-            }
-        }
-        return possibleMove;
-    }
-    /** A random-number generator used for move selection. */
+    /**
+     * A random-number generator used for move selection.
+     */
     private Random _random;
 
-    /** Used to convey moves discovered by minMax. */
-    private int _foundMove;
-
-    /** Define winning value. */
+    /**
+     * Define winning value.
+     */
     private static int _winningValue = Integer.MAX_VALUE;
 }
