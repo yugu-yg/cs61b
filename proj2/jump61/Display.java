@@ -3,6 +3,7 @@ package jump61;
 import ucb.gui2.TopLevel;
 import ucb.gui2.LayoutSpec;
 
+import java.io.PrintWriter;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import static jump61.Side.*;
@@ -24,16 +25,16 @@ class Display extends TopLevel implements View, CommandSource, Reporter {
 
         addMenuButton("Game->Quit", this::quit);
         addMenuButton("Game->New Game", this::newGame);
-        addMenuButton("Game->Help", this::help);
-        addMenuButton("Setting->Board Size", this::setSize);
-        addMenuButton("Setting->Auto Red", this::autoRed);
-        addMenuButton("Setting->Auto Blue", this::autoBlue);
-        addMenuButton("Setting->Manual Red", this::manualRed);
-        addMenuButton("Setting->Manual Blue", this::manualBlue);
 
         _boardWidget = new BoardWidget(_commandQueue);
         add(_boardWidget, new LayoutSpec("y", 1, "width", 2));
         display(true);
+
+        addMenuButton("Player->Auto Red", this::autoRed);
+        addMenuButton("Player->Auto Blue", this::autoBlue);
+        addMenuButton("Player->Manual Red", this::manualRed);
+        addMenuButton("Player->Manual Blue", this::manualBlue);
+        addMenuButton("Size->Set Size", this::setSize);
     }
 
     /** Response to "Quit" button click. */
@@ -46,11 +47,6 @@ class Display extends TopLevel implements View, CommandSource, Reporter {
         _commandQueue.offer("new");
     }
 
-    /** Response to "Help" button click. */
-    void help(String dummy) {
-        _commandQueue.offer("help");
-    }
-
     /** Response to "Size" button click. */
     void setSize(String dummy) {
         String n = getTextInput("SET SIZE", "SIZE", "", "");
@@ -60,7 +56,6 @@ class Display extends TopLevel implements View, CommandSource, Reporter {
 
     /** Response to "Auto Red" button click. */
     void autoRed(String dummy) {
-        setSize(dummy);
         _commandQueue.offer("auto red");
     }
     /** Response to "Auto Blue" button click. */
@@ -119,7 +114,9 @@ class Display extends TopLevel implements View, CommandSource, Reporter {
 
     /** The widget that displays the actual playing board. */
     private BoardWidget _boardWidget;
+
     /** Queue for commands going to the controlling Game. */
     private final ArrayBlockingQueue<String> _commandQueue =
         new ArrayBlockingQueue<>(5);
+
 }

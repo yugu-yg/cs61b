@@ -62,16 +62,6 @@ class AI extends Player {
         return getBoard().sqNum(r, c);
     }
 
-
-    /**
-     * Find a move from position b and return its value, recording
-     * the move found in _foundMove iff SAVEMOVE. The move
-     * should have maximal value or have value > BETA if SENSE==1,
-     * and minimal value or value < ALPHA if SENSE==-1. Searches up to
-     * DEPTH levels.  Searching at level 0 simply returns a static estimate
-     * of the board value and does not set _foundMove. If the game is over
-     * on BOARD, does not set _foundMove.
-     */
     /**
      * @param board this is board of table
      * @param moves this is moves
