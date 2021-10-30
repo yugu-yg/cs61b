@@ -93,6 +93,7 @@ public class Main {
 
         String addStory = readStory + "\n" + args[1];
         Utils.writeContents(f, addStory);
+        System.out.println(addStory);
     }
 
     /**
